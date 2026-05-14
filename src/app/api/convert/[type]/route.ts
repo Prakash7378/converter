@@ -90,14 +90,18 @@ export async function POST(
         );
     }
 
-    return new Response(converted, {
-      headers: {
-        "Content-Type": contentType,
+    return new Response(
+      new Uint8Array(converted),
+      {
+        headers: {
+          "Content-Type":
+            contentType,
 
-        "Content-Disposition":
-          `attachment; filename=${fileName}`,
-      },
-    });
+          "Content-Disposition":
+            `attachment; filename=${fileName}`,
+        },
+      }
+    );
   } catch (error) {
     console.error(error);
 
