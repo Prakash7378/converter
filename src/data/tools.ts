@@ -15,7 +15,6 @@ description:
 },
 {
 name: "WEBP to JPG",
-2
 slug: "webp-to-jpg",
 type: "jpg",
 description:
