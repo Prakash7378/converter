@@ -1,8 +1,8 @@
+import type { Metadata } from "next";
+
 import { notFound } from "next/navigation";
 
 import UploadBox from "@/components/UploadBox";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import AdBanner from "@/components/AdBanner";
 
 import { tools } from "@/data/tools";
@@ -15,21 +15,31 @@ interface Props {
 
 export async function generateMetadata({
   params,
-}: Props) {
+}: Props): Promise<Metadata> {
   const { slug } = await params;
 
   const tool = tools.find(
-    (t) => t.slug === slug
+    (item) => item.slug === slug
   );
 
   if (!tool) {
-    return {};
+    return {
+      title: "Tool Not Found",
+    };
   }
 
   return {
-    title: tool.title,
+    title: tool.name,
 
     description: tool.description,
+
+    keywords: [
+      tool.name,
+      "image converter",
+      "file converter",
+      "online tools",
+      "free converter",
+    ],
   };
 }
 
@@ -39,44 +49,112 @@ export default async function ToolPage({
   const { slug } = await params;
 
   const tool = tools.find(
-    (t) => t.slug === slug
+    (item) => item.slug === slug
   );
 
   if (!tool) {
     notFound();
   }
 
+  const uploadTools = [
+    "png",
+    "jpg",
+    "webp",
+    "compress",
+    "resize",
+    "crop",
+    "rotate",
+    "blur",
+    "grayscale",
+    "ico",
+    "pdf",
+    "pngpdf",
+  ];
+
+  const isUploadTool =
+    uploadTools.includes(tool.type);
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <Navbar />
+      <section className="max-w-5xl mx-auto px-6 py-20">
+        <div className="text-center">
+          <h1 className="text-5xl md:text-6xl font-black mb-6">
+            {tool.name}
+          </h1>
 
-      <div className="max-w-4xl mx-auto p-8 pt-24">
-        <h1 className="text-5xl font-bold text-center mb-10">
-          {tool.title}
-        </h1>
-
-        <UploadBox
-          endpoint={tool.endpoint}
-          outputFileName={tool.output}
-          label={tool.label}
-        />
+          <p className="text-gray-400 text-lg leading-8 max-w-3xl mx-auto">
+            {tool.description}
+          </p>
+        </div>
 
         <AdBanner slot="1234567890" />
 
-        <section className="mt-20 space-y-10">
-          <div>
-            <h2 className="text-3xl font-bold mb-4">
-              {tool.title}
+        {isUploadTool ? (
+          <div className="mt-14">
+            <UploadBox
+              endpoint={`/api/convert/${tool.type}`}
+              outputFileName={`converted.${tool.type}`}
+              label={`Drag & Drop File for ${tool.name}`}
+            />
+          </div>
+        ) : (
+          <div className="mt-14 bg-slate-900 border border-slate-800 rounded-3xl p-10 text-center">
+            <h2 className="text-3xl font-bold mb-6">
+              Coming Soon
             </h2>
 
             <p className="text-gray-400 leading-8">
-              {tool.description}
+              This tool is currently under
+              development and will be added
+              soon.
             </p>
           </div>
-        </section>
-      </div>
+        )}
 
-      <Footer />
+        <div className="mt-20 bg-slate-900 border border-slate-800 rounded-3xl p-10">
+          <h2 className="text-3xl font-bold mb-6">
+            About {tool.name}
+          </h2>
+
+          <p className="text-gray-400 leading-8">
+            ConvertFast provides free online
+            tools for image conversion, PDF
+            conversion and productivity tasks.
+            Our platform is optimized for
+            speed, security and ease of use.
+          </p>
+        </div>
+
+        <div className="mt-10 bg-slate-900 border border-slate-800 rounded-3xl p-10">
+          <h2 className="text-3xl font-bold mb-6">
+            Why Use ConvertFast?
+          </h2>
+
+          <ul className="space-y-4 text-gray-400">
+            <li>
+              ✅ Free online tools
+            </li>
+
+            <li>
+              ✅ Fast processing
+            </li>
+
+            <li>
+              ✅ Mobile friendly
+            </li>
+
+            <li>
+              ✅ No registration required
+            </li>
+
+            <li>
+              ✅ Secure file handling
+            </li>
+          </ul>
+        </div>
+
+        <AdBanner slot="9876543210" />
+      </section>
     </main>
   );
 }
