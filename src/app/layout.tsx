@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 
   description:
     "Free online file converter tools.",
+
+  verification: {
+    google: "Ea74bum3IGXsVbi2TmjoxnpVztWV-Ad7juL2NBN0_mg",
+  },
 };
+
+/*<meta name="google-site-verification" content="Ea74bum3IGXsVbi2TmjoxnpVztWV-Ad7juL2NBN0_mg" />*/
 
 export default function RootLayout({
   children,
