@@ -6,20 +6,13 @@ interface Props {
   slot: string;
 }
 
-declare global {
-  interface Window {
-    adsbygoogle: unknown[];
-  }
-}
-
 export default function AdBanner({
   slot,
 }: Props) {
   useEffect(() => {
     try {
-      if (window.adsbygoogle) {
-        window.adsbygoogle.push({});
-      }
+      ((window as any).adsbygoogle =
+        (window as any).adsbygoogle || []).push({});
     } catch (err) {
       console.error(err);
     }
@@ -30,7 +23,7 @@ export default function AdBanner({
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+        data-ad-client="ca-pub-123456789"
         data-ad-slot={slot}
         data-ad-format="auto"
         data-full-width-responsive="true"

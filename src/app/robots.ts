@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
     },
 
     sitemap:
-      "https://convertfast.vercel.app/sitemap.xml",
+      "https://converter-gold-psi.vercel.app/sitemap.xml",
   };
 }

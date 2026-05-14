@@ -1,21 +1,19 @@
-import Link from "next/link";
-
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-800 mt-32 py-10">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-        <p className="text-gray-500">
-          © 2026 ConvertFast
+    <footer className="border-t border-slate-800 bg-slate-950 py-10 mt-20">
+      <div className="max-w-7xl mx-auto px-6 text-center text-gray-400">
+        <p>
+          © 2026 ConvertFast. All rights reserved.
         </p>
 
-        <div className="flex gap-6 mt-4 md:mt-0 text-gray-400">
-          <Link href="/privacy-policy">
+        <div className="flex justify-center gap-6 mt-4 flex-wrap">
+          <a href="/privacy-policy">
             Privacy Policy
-          </Link>
+          </a>
 
-          <Link href="/terms">
+          <a href="/terms-and-conditions">
             Terms
-          </Link>
+          </a>
         </div>
       </div>
     </footer>

@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import "./globals.css";
-
 import Script from "next/script";
 
+import "./globals.css";
+
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 export const metadata: Metadata = {
-  title: "ConvertFast",
+  title: {
+    default: "ConvertFast",
+    template: "%s | ConvertFast",
+  },
+
   description:
-    "Free online file converter",
+    "Free online file converter tools.",
 };
 
 export default function RootLayout({
@@ -16,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-slate-950 text-white">
         <Script
           async
           strategy="afterInteractive"
@@ -24,7 +31,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
+        <Navbar />
+
         {children}
+
+        <Footer />
       </body>
     </html>
   );
