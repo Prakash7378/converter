@@ -60,7 +60,6 @@ name: "Grayscale Image",
 slug: "grayscale-image",
 type: "grayscale",
 description:
-3
 "Convert images into grayscale.",
 },
 {
@@ -105,7 +104,6 @@ type: "base64decode",
 description:
 "Decode Base64 instantly.",
 },
-4
 {
 name: "Color Picker",
 slug: "color-picker",
