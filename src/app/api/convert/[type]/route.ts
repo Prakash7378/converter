@@ -86,10 +86,40 @@ export async function POST(
         extension = "png";
         break;
 
+      case "rotate":
+        converted = await sharp(buffer)
+          .rotate(90)
+          .png()
+          .toBuffer();
+
+        contentType = "image/png";
+        extension = "png";
+        break;
+
+      case "grayscale":
+        converted = await sharp(buffer)
+          .grayscale()
+          .png()
+          .toBuffer();
+
+        contentType = "image/png";
+        extension = "png";
+        break;
+
+      case "blur":
+        converted = await sharp(buffer)
+          .blur(5)
+          .png()
+          .toBuffer();
+
+        contentType = "image/png";
+        extension = "png";
+        break;
+
       default:
         return Response.json(
           {
-            error: "Invalid conversion type",
+            error: "Invalid type",
           },
           {
             status: 400,
@@ -113,8 +143,7 @@ export async function POST(
 
     return Response.json(
       {
-        error:
-          "Conversion failed",
+        error: "Failed",
       },
       {
         status: 500,

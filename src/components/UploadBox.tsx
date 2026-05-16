@@ -39,12 +39,6 @@ export default function UploadBox({
           }
         );
 
-        if (!response.ok) {
-          throw new Error(
-            "Conversion failed"
-          );
-        }
-
         const blob =
           await response.blob();
 
@@ -91,10 +85,6 @@ export default function UploadBox({
         );
       } catch (error) {
         console.error(error);
-
-        alert(
-          "Conversion failed"
-        );
       } finally {
         setLoading(false);
       }
@@ -123,7 +113,7 @@ export default function UploadBox({
 
       {loading ? (
         <p className="text-lg">
-          Converting...
+          Processing...
         </p>
       ) : (
         <div>
