@@ -1,12 +1,8 @@
-import {
-  compressImage,
-  convertToJPG,
-  convertToPNG,
-  convertToWEBP,
-} from "@/lib/converter";
+import { NextRequest } from "next/server";
+import sharp from "sharp";
 
 export async function POST(
-  req: Request,
+  req: NextRequest,
   context: {
     params: Promise<{
       type: string;
@@ -18,72 +14,83 @@ export async function POST(
 
     const formData = await req.formData();
 
-    const file = formData.get("file") as File;
+    const file = formData.get(
+      "file"
+    ) as File;
 
     if (!file) {
-      return new Response(
-        "No file uploaded",
+      return Response.json(
+        {
+          error: "No file uploaded",
+        },
         {
           status: 400,
         }
       );
     }
 
-    const bytes =
-      await file.arrayBuffer();
+    const bytes = await file.arrayBuffer();
 
     const buffer = Buffer.from(bytes);
 
     let converted: Buffer;
-
-    let contentType = "";
-
-    let fileName = "";
+    let contentType = "image/png";
+    let extension = "png";
 
     switch (type) {
       case "png":
-        converted =
-          await convertToPNG(buffer);
+        converted = await sharp(buffer)
+          .png()
+          .toBuffer();
 
         contentType = "image/png";
-
-        fileName = "converted.png";
-
-        break;
-
-      case "webp":
-        converted =
-          await convertToWEBP(buffer);
-
-        contentType = "image/webp";
-
-        fileName = "converted.webp";
-
+        extension = "png";
         break;
 
       case "jpg":
-        converted =
-          await convertToJPG(buffer);
+        converted = await sharp(buffer)
+          .jpeg()
+          .toBuffer();
 
         contentType = "image/jpeg";
+        extension = "jpg";
+        break;
 
-        fileName = "converted.jpg";
+      case "webp":
+        converted = await sharp(buffer)
+          .webp()
+          .toBuffer();
 
+        contentType = "image/webp";
+        extension = "webp";
         break;
 
       case "compress":
-        converted =
-          await compressImage(buffer);
+        converted = await sharp(buffer)
+          .jpeg({
+            quality: 60,
+          })
+          .toBuffer();
 
         contentType = "image/jpeg";
+        extension = "jpg";
+        break;
 
-        fileName = "compressed.jpg";
+      case "resize":
+        converted = await sharp(buffer)
+          .resize(800)
+          .png()
+          .toBuffer();
 
+        contentType = "image/png";
+        extension = "png";
         break;
 
       default:
-        return new Response(
-          "Invalid conversion type",
+        return Response.json(
+          {
+            error: "Invalid conversion type",
+          },
           {
             status: 400,
           }
@@ -97,16 +104,18 @@ export async function POST(
           "Content-Type":
             contentType,
 
-          "Content-Disposition":
-            `attachment; filename=${fileName}`,
+          "Content-Disposition": `attachment; filename="converted.${extension}"`,
         },
       }
     );
   } catch (error) {
     console.error(error);
 
-    return new Response(
-      "Conversion failed",
+    return Response.json(
+      {
+        error:
+          "Conversion failed",
+      },
       {
         status: 500,
       }

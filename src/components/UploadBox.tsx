@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useDropzone } from "react-dropzone";
 
 interface Props {
   endpoint: string;
-
   outputFileName: string;
-
   label: string;
 }
 
@@ -20,153 +18,123 @@ export default function UploadBox({
   const [loading, setLoading] =
     useState(false);
 
-  const [success, setSuccess] =
-    useState(false);
-
-  const [fileName, setFileName] =
-    useState("");
-
-  const [preview, setPreview] =
-    useState("");
-
-  const onDrop = async (
-    acceptedFiles: File[]
-  ) => {
-    try {
-      setLoading(true);
-
-      setSuccess(false);
-
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
 
-      if (!file.type.startsWith("image/")) {
-        alert("Please upload an image");
+      if (!file) return;
 
-        setLoading(false);
-
-        return;
-      }
-
-      const MAX_SIZE =
-        5 * 1024 * 1024;
-
-      if (file.size > MAX_SIZE) {
-        alert(
-          "File size must be under 5MB"
-        );
-
-        setLoading(false);
-
-        return;
-      }
-
-      setFileName(file.name);
-
-      setPreview(
-        URL.createObjectURL(file)
-      );
+      setLoading(true);
 
       const formData = new FormData();
 
       formData.append("file", file);
 
-      const response = await fetch(
-        endpoint,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const blob =
-        await response.blob();
-
-      const url =
-        window.URL.createObjectURL(
-          blob
+      try {
+        const response = await fetch(
+          endpoint,
+          {
+            method: "POST",
+            body: formData,
+          }
         );
 
-      const a =
-        document.createElement("a");
+        if (!response.ok) {
+          throw new Error(
+            "Conversion failed"
+          );
+        }
 
-      a.href = url;
+        const blob =
+          await response.blob();
 
-      a.download = outputFileName;
+        const url =
+          window.URL.createObjectURL(
+            blob
+          );
 
-      a.click();
+        const a =
+          document.createElement("a");
 
-      URL.revokeObjectURL(url);
+        a.href = url;
 
-      setSuccess(true);
-    } catch (error) {
-      console.error(error);
+        const disposition =
+          response.headers.get(
+            "Content-Disposition"
+          );
 
-      alert(
-        "Something went wrong while converting the image."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+        let filename =
+          outputFileName;
 
-  const { getRootProps, getInputProps } =
-    useDropzone({
-      onDrop,
+        if (disposition) {
+          const match =
+            disposition.match(
+              /filename="(.+)"/
+            );
 
-      accept: {
-        "image/*": [],
-      },
+          if (match?.[1]) {
+            filename =
+              match[1];
+          }
+        }
 
-      multiple: false,
-    });
+        a.download = filename;
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        window.URL.revokeObjectURL(
+          url
+        );
+      } catch (error) {
+        console.error(error);
+
+        alert(
+          "Conversion failed"
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [endpoint, outputFileName]
+  );
+
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+  } = useDropzone({
+    onDrop,
+  });
 
   return (
     <div
       {...getRootProps()}
-      className="border-2 border-dashed border-blue-500 p-20 rounded-3xl text-center cursor-pointer hover:bg-slate-900 transition bg-slate-950"
+      className={`border-2 border-dashed p-16 rounded-3xl text-center cursor-pointer transition-all duration-300 ${
+        isDragActive
+          ? "border-blue-500 bg-blue-500/10"
+          : "border-slate-700"
+      }`}
     >
       <input {...getInputProps()} />
 
-      {preview && !loading && (
-        <img
-          src={preview}
-          alt="preview"
-          className="max-h-64 mx-auto rounded-2xl mb-6"
-        />
-      )}
-
-      {!loading && (
-        <>
-          <p className="text-2xl font-bold">
+      {loading ? (
+        <p className="text-lg">
+          Converting...
+        </p>
+      ) : (
+        <div>
+          <p className="text-2xl font-bold mb-4">
             {label}
           </p>
 
-          <p className="text-gray-400 mt-4">
-            or click to browse
-          </p>
-        </>
-      )}
-
-      {fileName && !loading && (
-        <p className="mt-6 text-blue-400">
-          Selected: {fileName}
-        </p>
-      )}
-
-      {loading && (
-        <div>
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
-
-          <p className="mt-6">
-            Processing image...
+          <p className="text-gray-400">
+            Click or drag files here
           </p>
         </div>
-      )}
-
-      {success && !loading && (
-        <p className="mt-6 text-green-500">
-          Image converted successfully!
-        </p>
       )}
     </div>
   );
